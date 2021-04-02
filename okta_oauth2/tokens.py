@@ -2,6 +2,7 @@ import base64
 import logging
 import time
 from typing import Optional
+from pprint import pprint
 
 import jwt as jwt_python
 import requests
@@ -92,6 +93,7 @@ class TokenValidator:
             claims = self.request_userinfo(token_result["access_token"])
         else:
             claims = self.validate_token(token_result["id_token"])
+        pprint(claims)
 
         if claims:
             tokens["id_token"] = token_result["id_token"]
@@ -163,8 +165,12 @@ class TokenValidator:
 
         data.update(endpoint_data)
         # Send token request
+        pprint(token_endpoint)
+        pprint(headers)
+        pprint(data)
         r = requests.post(token_endpoint, headers=header, params=data)
         response = r.json()
+        pprint(response)
 
         # Return object
         result = {}
