@@ -166,7 +166,7 @@ class TokenValidator:
         data.update(endpoint_data)
         # Send token request
         pprint(token_endpoint)
-        pprint(headers)
+        pprint(header)
         pprint(data)
         r = requests.post(token_endpoint, headers=header, params=data)
         response = r.json()
