@@ -161,7 +161,10 @@ class TokenValidator:
             "Content-Type": "application/x-www-form-urlencoded",
         }
 
-        data = {"scope": self.config.scopes, "redirect_uri": self.config.redirect_uri}
+        data = {
+            "scope": self.config.scopes,
+            "redirect_uri": self.config.get_redirect_url(self.request)
+        }
 
         data.update(endpoint_data)
         # Send token request

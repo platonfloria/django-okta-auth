@@ -1,5 +1,7 @@
 import re
 
+from urllib.parse import urlparse
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch, reverse
@@ -69,3 +71,11 @@ class Config:
         )
 
         return [re.compile(u) for u in public_urls]
+
+    def get_redirect_url(self, request):
+        return urlparse(request.get_raw_uri())._replace(
+            path=self.redirect_uri,
+            params='',
+            query='',
+            fragment=''
+        ).geturl()

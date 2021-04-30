@@ -23,7 +23,7 @@ def login(request):
     okta_config = {
         "clientId": config.client_id,
         "url": config.org_url,
-        "redirectUri": str(config.redirect_uri),
+        "redirectUri": config.get_redirect_url(request),
         "scope": config.scopes,
         "issuer": config.issuer,
     }
