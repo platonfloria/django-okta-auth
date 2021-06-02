@@ -26,7 +26,7 @@ def login(request):
     nonce = secrets.token_urlsafe(10)
     state = secrets.token_urlsafe(10)
 
-    base_auth_url = urljoin(config.org_url, self.config.okta_authorize_url)
+    base_auth_url = urljoin(config.org_url, config.okta_authorize_url)
     base_auth_url = urlparse(base_auth_url)._replace(
         query=urlencode({
             'client_id': config.client_id,
