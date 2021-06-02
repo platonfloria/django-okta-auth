@@ -1,4 +1,5 @@
 import logging
+import secrets
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
@@ -14,23 +15,32 @@ from django.urls.exceptions import NoReverseMatch
 
 from .conf import Config
 
+from urllib.parse import urljoin, urlparse, urlencode, quote
+
 logger = logging.getLogger(__name__)
 
 
 def login(request):
     config = Config()
 
-    okta_config = {
-        "clientId": config.client_id,
-        "url": config.org_url,
-        "redirectUri": config.get_redirect_url(request),
-        "scope": config.scopes,
-        "issuer": config.issuer,
-    }
-    response = render(request, "okta_oauth2/login.html", {"config": okta_config})
+    nonce = secrets.token_urlsafe(10)
+    state = secrets.token_urlsafe(10)
 
-    _delete_cookies(response)
+    base_auth_url = urljoin(config.org_url, self.config.okta_authorize_url)
+    base_auth_url = urlparse(base_auth_url)._replace(
+        query=urlencode({
+            'client_id': config.client_id,
+            'redirect_uri': config.get_redirect_url(request),
+            'response_type': 'code',
+            'state': state,
+            'scope': config.scopes,
+        })
+    ).geturl()
 
+    response = redirect(base_auth_url)
+
+    response.set_cookie('okta-oauth-nonce', nonce)
+    response.set_cookie('okta-oauth-state', state)
     return response
 
 

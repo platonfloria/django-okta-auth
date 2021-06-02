@@ -1,6 +1,6 @@
 import re
 
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin, urlencode
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -38,6 +38,7 @@ class Config:
             )
             self.redirect_uri = settings.OKTA_AUTH["REDIRECT_URI"]
             self.login_redirect_url = settings.OKTA_AUTH.get("LOGIN_REDIRECT_URL", "/")
+            self.okta_authorize_url = settings.OKTA_AUTH.get('OKTA_AUTHORIZE_URL', "/oauth2/v1/authorize")
 
             # Django Specific
             self.cache_prefix = settings.OKTA_AUTH.get("CACHE_PREFIX", "okta")
@@ -72,8 +73,20 @@ class Config:
 
         return [re.compile(u) for u in public_urls]
 
+    def get_auth_url(self, request):
+        base_auth_url = urljoin(self.config.org_url, '/oauth2/v1/authorize')
+        return urlparse(base_auth_url)._replace(
+            query=urlencode(
+                {'client_id': 1}
+            )
+        ).geturl()
+
+
+
+
     def get_redirect_url(self, request):
         return urlparse(request.get_raw_uri())._replace(
+            scheme='https',
             path=self.redirect_uri,
             params='',
             query='',
