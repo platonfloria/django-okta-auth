@@ -56,3 +56,7 @@ class TokenRequestFailed(DjangoOktaAuthException):
 
 class MissingAuthTokens(DjangoOktaAuthException):
     pass
+
+
+class MissingLoginGroups(DjangoOktaAuthException):
+    pass

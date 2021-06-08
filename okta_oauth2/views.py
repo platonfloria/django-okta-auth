@@ -16,6 +16,7 @@ from django.urls.exceptions import NoReverseMatch
 from .conf import Config
 
 from urllib.parse import urljoin, urlparse, urlencode, quote
+from .exceptions import DjangoOktaAuthException
 
 logger = logging.getLogger(__name__)
 
@@ -54,11 +55,8 @@ def callback(request):
         error_description = request.GET.get(
             "error_description", "An unknown error occurred."
         )
-        try:
-            messages.error(request, error_description)
-        except MessageFailure:
-            return HttpResponseServerError(error_description)
-        return HttpResponseRedirect(reverse("okta_oauth2:login"))
+
+        return HttpResponse(error_description, status=401)
 
     code = request.GET["code"]
     state = request.GET["state"]
@@ -73,10 +71,10 @@ def callback(request):
             "Value {} does not match the assigned state".format(state)
         )
 
-    user = authenticate(request, auth_code=code, nonce=cookie_nonce)
-
-    if user is None:
-        return redirect(reverse("okta_oauth2:login"))
+    try:
+        user = authenticate(request, auth_code=code, nonce=cookie_nonce)
+    except DjangoOktaAuthException as e:
+        return HttpResponse(str(e), status=403)
 
     auth_login(request, user)
 
