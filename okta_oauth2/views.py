@@ -12,6 +12,7 @@ from django.http import (
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
+from django.http import HttpResponse
 
 from .conf import Config
 
